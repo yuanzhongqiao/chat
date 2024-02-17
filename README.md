@@ -1,219 +1,295 @@
 # Tinode Instant Messaging Server
 
-<img src="docs/logo.svg" align="left" width=128 height=128> Instant messaging server. Backend in pure [Go](http://golang.org) (license [GPL 3.0](http://www.gnu.org/licenses/gpl-3.0.en.html)), client-side binding in Java, Javascript, and Swift, as well as [gRPC](https://grpc.io/) client support for C++, C#, Go, Java, Node, PHP, Python, Ruby, Objective-C, etc. (license [Apache 2.0](http://www.apache.org/licenses/LICENSE-2.0)). Wire transport is JSON over websocket (long polling is also available) for custom bindings, or [protobuf](https://developers.google.com/protocol-buffers/) with gRPC.
-
-Tinode is *not* XMPP/Jabber. It is *not* compatible with XMPP. It's meant as a replacement for XMPP. On the surface, it's a lot like open source WhatsApp or Telegram.
-
-This is beta-quality software: feature-complete and stable but probably with a few bugs or missing features. Follow [instructions](INSTALL.md) to install and run or use one of the cloud services below. Read [API documentation](docs/API.md).
-
-<a href="https://apps.apple.com/us/app/tinode/id1483763538"><img src="docs/app-store.svg" height=36></a> <a href="https://play.google.com/store/apps/details?id=co.tinode.tindroidx"><img src="docs/play-store.svg" height=36></a> <a href="https://web.tinode.co/"><img src="docs/web-app.svg" height=36></a>
-
-## Why?
-
-The promise of [XMPP](http://xmpp.org/) was to deliver federated instant messaging: anyone would be able to spin up an IM server capable of exchanging messages with any other XMPP server in the world. Unfortunately, XMPP never delivered on this promise. Instant messengers are still a bunch of incompatible walled gardens, similar to what AoL of the late 1990s was to the open Internet.
-
-The goal of this project is to deliver on XMPP's original vision: create a modern open platform for federated instant messaging with an emphasis on mobile communication. A secondary goal is to create a decentralized IM platform that is much harder to track and block by the governments.
-
-An explicit NON-goal: we are not building yet another Slack replacement.
-
-## Installing and running
-
-See [general instructions](./INSTALL.md) or [docker-specific instructions](./docker/README.md).
-
-## Getting support
-
-* Read [API documentation](docs/API.md) and [FAQ](docs/faq.md). Read configuration instructions contained in the [`tinode.conf`](./server/tinode.conf) file.
-* For support, general questions, discussions post to [https://groups.google.com/d/forum/tinode](https://groups.google.com/d/forum/tinode).
-* For bugs and feature requests [open an issue](https://github.com/tinode/chat/issues/new/choose).
-* Use https://tinode.co/contact for commercial inquiries.
-
-## Helping out
-
-* If you appreciate our work, please help spread the word! Sharing on Reddit, HN, and other communities helps more than you think.
-* Consider buying paid support: https://tinode.co/support.html
-* If you are a software developer, send us your pull requests with bug fixes and new features.
-* If you use the app and discover bugs or missing features, let us know by filing bug reports and feature requests. Vote for existing [feature requests](https://github.com/tinode/chat/issues?q=is%3Aissue+is%3Aopen+sort%3Areactions-%2B1-desc+label%3A%22feature+request%22) you find most valuable.
-* If you speak a language other than English, [translate](docs/translations.md) the apps into your language. You may also review and improve existing translations.
-* If you are a UI/UX expert, help us polish the app UI.
-* Use it: install it for your colleagues or friends at work or at home.
-
-## Public service
-
-A [public Tinode service](https://web.tinode.co/) is available. You can use it just like any other instant messenger. Keep in mind that demo accounts present in [sandbox](https://sandbox.tinode.co/) are not available in the public service. You must register an account using valid email in order to use the service.
-
-### Web
-
-TinodeWeb, a single page web app, is available at https://web.tinode.co/ ([source](https://github.com/tinode/webapp/)). See screenshots below.
-
-### Android
-
-[Tinode for Android](https://play.google.com/store/apps/details?id=co.tinode.tindroidx) a.k.a Tindroid is stable and functional ([source](https://github.com/tinode/tindroid)). See the screenshots below. A [debug APK](https://github.com/tinode/tindroid/releases/latest) is also provided for convenience.
-
-### iOS
-
-[Tinode for iOS](https://apps.apple.com/us/app/tinode/id1483763538) a.k.a. Tinodios is stable and functional ([source](https://github.com/tinode/ios)). See the screenshots below.
-
-
-## Demo/Sandbox
-
-A sandboxed demo service is available at https://sandbox.tinode.co/.
-
-Log in as one of `alice`, `bob`, `carol`, `dave`, `frank`. Password is `<login>123`, e.g. login for `alice` is `alice123`. You can discover other users by email or phone by prefixing them with `email:` or `tel:` respectively. Emails are `<login>@example.com`, e.g. `alice@example.com`, phones are `+17025550001` through `+17025550009`.
-
-When you register a new account you are asked for an email address to send validation code to. For demo purposes you may use `123456` as a universal validation code. The code you get in the email is also valid.
-
-### Sandbox Notes
-
-* The sandbox server is reset (all data wiped) every night at 3:15am Pacific time. An error message `User not found or offline` means the server was reset while you were connected. If you see it on the web, reload and relogin. On Android log out and re-login. If the database was changed, delete the app then reinstall.
-* Sandbox user `Tino` is a [basic chatbot](./chatbot) which responds with a [random quote](http://fortunes.cat-v.org/) to any message.
-* As generally accepted, when you register a new account you are asked for an email address. The server will send an email with a verification code to that address and you can use it to validate the account. To make things easier for testing, the server will also accept `123456` as a verification code. Remove line `"debug_response": "123456"` from `tinode.conf` to disable this option.
-* The sandbox server is configured to use [ACME](https://letsencrypt.org/) TLS [implementation](https://godoc.org/golang.org/x/crypto/acme) with hard-coded requirement for [SNI](https://en.wikipedia.org/wiki/Server_Name_Indication). If you are unable to connect then the most likely reason is your TLS client's missing support for SNI. Use a different client.
-* The default web app loads a single minified javascript bundle and minified CSS. The un-minified version is also available at https://sandbox.tinode.co/index-dev.html
-* [Docker images](https://hub.docker.com/u/tinode/) with the same demo are available.
-* You are welcome to test your client software against the sandbox, hack it, etc. No DDoS-ing though please.
-
-## Features
-
-### Supported
-
-* Multiple native platforms:
-  * [Android](https://github.com/tinode/tindroid/) (Java)
-  * [iOS](https://github.com/tinode/ios) (Swift)
-  * [Web](https://github.com/tinode/webapp/) (React.js)
-  * Scriptable [command line](tn-cli/) (Python)
-* User features:
-  * One-on-one and group messaging.
-  * Video and voice calls. Voice messages.
-  * Channels with unlimited number of read-only subscribers.
-  * All chats are synchronized across all devices.
-  * Granular access control with permissions for various actions.
-  * User search/discovery.
-  * Rich formatting of messages markdown-style: \*style\* &rarr; **style**, with inline images, videos, file attachments.
-  * Forms and templated responses suitable for chatbots.
-  * Verified/staff/untrusted account markers.
-  * Message status notifications: message delivery to server; received and read notifications; typing notifications.
-  * Most recent message preview in contact list.
-  * Server-generated presence notifications for people, group chats.
-  * Forwarding and replying to messages.
-  * Editing sent messages.
-* Administration:
-  * Granular access control with permissions for various actions.
-  * Support for custom authentication backends.
-  * Ability to block unwanted communication server-side.
-  * Anonymous users (important for use cases related to tech support over chat).
-  * Plugins to extend functionality, for example, to support moderation or chatbots.
-  * Scriptable [command-line tool](tn-cli/) for server administration.
-* Performance, reliability and development:
-  * Sharded clustering with failover.
-  * Storage and out of band transfer of large objects like images or document files using local file system or Amazon S3 (other storage systems can be supported with [media handlers](https://github.com/tinode/chat/blob/master/server/media/media.go#L21)).
-  * JSON or [protobuf version 3](https://developers.google.com/protocol-buffers/) wire protocols.
-  * Bindings for various programming languages:
-    * Javascript with no external dependencies.
-    * Java with dependencies on [Jackson](https://github.com/FasterXML/jackson) and [Java-Websocket](https://github.com/TooTallNate/Java-WebSocket). Suitable for Android but with no Android SDK dependencies.
-    * Swift with no external dependencies.
-    * C/C++, C#, Go, Python, PHP, Ruby and many other languages using [gRPC](https://grpc.io/docs/languages/).
-  * Choice of a database backend. Other databases can be added with by writing [adapters](server/db/adapter.go).
-    * MySQL
-    * PostgreSQL
-    * MongoDB
-    * [RethinkDB](http://rethinkdb.com/)
-
-### Planned
-
-* [Federation](https://en.wikipedia.org/wiki/Federation_(information_technology)).
-* Location and contacts sharing.
-* Previews of attached documents, links.
-* Recording video messages.
-* Video/audio broadcasting.
-* Group video/audio calls.
-* Attaching music/audio other than voice messages.
-* Better emoji support.
-* Different levels of message persistence (from strict persistence to "store until delivered" to purely ephemeral messaging).
-* Message encryption at rest.
-* End to end encryption with [OTR](https://en.wikipedia.org/wiki/Off-the-Record_Messaging) for one-on-one messaging and undecided method for group messaging.
-* Full text search in messages.
-
-### Translations
-
-All client software has support for [internationalization](docs/translations.md). The following translations are provided:
-
-| Language | Server | Webapp | Android | iOS |
-| --- | :---: | :---: | :---: | :---: |
-| English | &check; | &check; | &check; | &check; |
-| Chinese simplified | &check; | &check; | &check; | &check; |
-| Chinese traditional |   | &check; | &check; | &check; |
-| French | &check; | &check; | &check; |   |
-| German |   | &check; | &check; |   |
-| Hindi |   |   | &check; |   |
-| Korean |   | &check; | &check; |   |
-| Portuguese | &check; |   | &check; |   |
-| Romanian |   | &check; | &check; |   |
-| Russian | &check; | &check; | &check; | &check; |
-| Spanish | &check; | &check; | &check; | &check; |
-| Thai |   | &check; |   |   |
-| Ukrainian | &check; | &check; | &check; | &check; |
-| Vietnamese | &check; |   |   |   |
-
-More translations are [welcome](docs/translations.md). In addition to languages listed above, particularly interested in Arabic, Bengali, Indonesian, Urdu, Japanese, Turkish, Persian.
-
-## Third-Party
-
-### Projects
-
-* [Arango DB adapter](https://github.com/gfxlabs/chat/tree/master/server/db/arango)
-* [DynamoDB adapter](https://github.com/riandyrn/chat/tree/master/server/db/dynamodb) (outdated)
-
-### Licenses
-
-* Demo avatars and some other graphics are from https://www.pexels.com/ under [CC0 license](https://www.pexels.com/photo-license/) and https://pixabay.com/ under their [license](https://pixabay.com/service/license/).
-* Web and Android background patterns are from http://subtlepatterns.com/ under [CC BY-SA 3.0](https://creativecommons.org/licenses/by-sa/3.0/) license.
-* Android icons are from https://material.io/tools/icons/ under [Apache 2.0](https://www.apache.org/licenses/LICENSE-2.0.html) license.
-
-## Screenshots
-
-### [Android](https://github.com/tinode/tindroid/)
-
-<p align="center">
-<img src="docs/android-contacts.png" alt="Android screenshot: list of chats" width=250 />
-<img src="docs/android-chat.png" alt="Android screenshot: one conversation" width=250 />
-<img src="docs/android-video-call.png" alt="Android screenshot: video call" width=250 />
+<div class="Box-sc-g0xbh4-0 bJMeLZ js-snippet-clipboard-copy-unpositioned" data-hpc="true"><article class="markdown-body entry-content container-lg" itemprop="text"><h1 tabindex="-1" dir="auto"><a id="user-content-tinode-instant-messaging-server" class="anchor" aria-hidden="true" tabindex="-1" href="#tinode-instant-messaging-server"><svg class="octicon octicon-link" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z"></path></svg></a><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">Tinode即时通讯服务器</font></font></h1>
+<p dir="auto"><a target="_blank" rel="noopener noreferrer" href="/tinode/chat/blob/master/docs/logo.svg"><img src="/tinode/chat/raw/master/docs/logo.svg" align="left" width="128" height="128" style="max-width: 100%;"></a><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">即时通讯服务器。纯</font></font><a href="http://golang.org" rel="nofollow"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">Go</font></font></a><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">后端</font><font style="vertical-align: inherit;">（许可证</font></font><a href="http://www.gnu.org/licenses/gpl-3.0.en.html" rel="nofollow"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">GPL 3.0</font></font></a><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">），客户端绑定 Java、Javascript 和 Swift，以及对 C++、C#、Go、Java、Node、PHP、Python、Ruby、Objective-C 等的</font></font><a href="https://grpc.io/" rel="nofollow"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">gRPC</font></font></a><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">客户端支持.（许可证</font></font><a href="http://www.apache.org/licenses/LICENSE-2.0" rel="nofollow"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">Apache 2.0</font></font></a><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">）。有线传输是基于 websocket 的 JSON（也可以使用长轮询）用于自定义绑定，或使用 gRPC 的</font></font><a href="https://developers.google.com/protocol-buffers/" rel="nofollow"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">protobuf</font></font></a><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">。</font></font></p>
+<p dir="auto"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">Tinode 不是</font></font><em><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">XMPP</font></font></em><font style="vertical-align: inherit;"><font style="vertical-align: inherit;"> /Jabber。它</font><font style="vertical-align: inherit;">与 XMPP</font></font><em><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">不</font></font></em><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">兼容。它旨在替代 XMPP。从表面上看，它很像开源 WhatsApp 或 Telegram。</font></font></p>
+<p dir="auto"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">这是测试版质量的软件：功能完整且稳定，但可能存在一些错误或缺少功能。按照</font></font><a href="/tinode/chat/blob/master/INSTALL.md"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">说明</font></font></a><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">安装并运行或使用以下云服务之一。阅读</font></font><a href="/tinode/chat/blob/master/docs/API.md"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">API 文档</font></font></a><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">。</font></font></p>
+<p dir="auto"><a href="https://apps.apple.com/us/app/tinode/id1483763538" rel="nofollow"><img src="/tinode/chat/raw/master/docs/app-store.svg" height="36" style="max-width: 100%;"></a> <a href="https://play.google.com/store/apps/details?id=co.tinode.tindroidx" rel="nofollow"><img src="/tinode/chat/raw/master/docs/play-store.svg" height="36" style="max-width: 100%;"></a> <a href="https://web.tinode.co/" rel="nofollow"><img src="/tinode/chat/raw/master/docs/web-app.svg" height="36" style="max-width: 100%;"></a></p>
+<h2 tabindex="-1" dir="auto"><a id="user-content-why" class="anchor" aria-hidden="true" tabindex="-1" href="#why"><svg class="octicon octicon-link" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z"></path></svg></a><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">为什么？</font></font></h2>
+<p dir="auto"><font style="vertical-align: inherit;"></font><a href="http://xmpp.org/" rel="nofollow"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">XMPP</font></font></a><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">的承诺</font><font style="vertical-align: inherit;">是提供联合即时消息传递：任何人都可以启动能够与世界上任何其他 XMPP 服务器交换消息的 IM 服务器。不幸的是，XMPP 从未兑现这一承诺。即时通讯工具仍然是一堆互不相容的围墙花园，类似于 20 世纪 90 年代末的 AoL 之于开放互联网。</font></font></p>
+<p dir="auto"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">该项目的目标是实现 XMPP 的最初愿景：为联合即时消息创建一个现代开放平台，重点是移动通信。第二个目标是创建一个更难以被政府追踪和阻止的去中心化即时通讯平台。</font></font></p>
+<p dir="auto"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">一个明确的非目标：我们不会构建另一个 Slack 替代品。</font></font></p>
+<h2 tabindex="-1" dir="auto"><a id="user-content-installing-and-running" class="anchor" aria-hidden="true" tabindex="-1" href="#installing-and-running"><svg class="octicon octicon-link" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z"></path></svg></a><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">安装并运行</font></font></h2>
+<p dir="auto"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">请参阅</font></font><a href="/tinode/chat/blob/master/INSTALL.md"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">一般说明</font></font></a><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">或</font></font><a href="/tinode/chat/blob/master/docker/README.md"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">docker 特定说明</font></font></a><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">。</font></font></p>
+<h2 tabindex="-1" dir="auto"><a id="user-content-getting-support" class="anchor" aria-hidden="true" tabindex="-1" href="#getting-support"><svg class="octicon octicon-link" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z"></path></svg></a><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">获得支持</font></font></h2>
+<ul dir="auto">
+<li><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">阅读</font></font><a href="/tinode/chat/blob/master/docs/API.md"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">API 文档</font></font></a><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">和</font></font><a href="/tinode/chat/blob/master/docs/faq.md"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">常见问题解答</font></font></a><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">。阅读文件中包含的配置说明</font></font><a href="/tinode/chat/blob/master/server/tinode.conf"><code>tinode.conf</code></a><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">。</font></font></li>
+<li><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">如需支持、一般问题、讨论，请访问</font></font><a href="https://groups.google.com/d/forum/tinode" rel="nofollow"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">https://groups.google.com/d/forum/tinode</font></font></a><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">。</font></font></li>
+<li><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">对于错误和功能请求，</font></font><a href="https://github.com/tinode/chat/issues/new/choose"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">请提出问题</font></font></a><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">。</font></font></li>
+<li><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">使用</font></font><a href="https://tinode.co/contact" rel="nofollow"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">https://tinode.co/contact</font></font></a><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">进行商业查询。</font></font></li>
+</ul>
+<h2 tabindex="-1" dir="auto"><a id="user-content-helping-out" class="anchor" aria-hidden="true" tabindex="-1" href="#helping-out"><svg class="octicon octicon-link" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z"></path></svg></a><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">帮忙</font></font></h2>
+<ul dir="auto">
+<li><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">如果您欣赏我们的工作，请帮忙宣传！在 Reddit、HN 和其他社区上分享比您想象的更有帮助。</font></font></li>
+<li><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">考虑购买付费支持： https: </font></font><a href="https://tinode.co/support.html" rel="nofollow"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">//tinode.co/support.html</font></font></a></li>
+<li><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">如果您是软件开发人员，请将包含错误修复和新功能的拉取请求发送给我们。</font></font></li>
+<li><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">如果您使用该应用程序并发现错误或缺少功能，请通过提交错误报告和功能请求来告知我们。投票选出您认为最有价值的现有</font></font><a href="https://github.com/tinode/chat/issues?q=is%3Aissue+is%3Aopen+sort%3Areactions-%2B1-desc+label%3A%22feature+request%22"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">功能请求</font></font></a><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">。</font></font></li>
+<li><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">如果您使用英语以外的语言，请将</font><font style="vertical-align: inherit;">应用程序</font></font><a href="/tinode/chat/blob/master/docs/translations.md"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">翻译</font></font></a><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">成您的语言。您还可以查看并改进现有翻译。</font></font></li>
+<li><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">如果您是 UI/UX 专家，请帮助我们完善应用程序 UI。</font></font></li>
+<li><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">使用它：为您的同事或朋友在工作或家里安装它。</font></font></li>
+</ul>
+<h2 tabindex="-1" dir="auto"><a id="user-content-public-service" class="anchor" aria-hidden="true" tabindex="-1" href="#public-service"><svg class="octicon octicon-link" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z"></path></svg></a><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">公共服务</font></font></h2>
+<p dir="auto"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">公共</font></font><a href="https://web.tinode.co/" rel="nofollow"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">Tinode 服务</font></font></a><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">可用。您可以像任何其他即时通讯工具一样使用它。请记住，</font></font><a href="https://sandbox.tinode.co/" rel="nofollow"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">沙箱</font></font></a><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">中存在的模拟帐户在公共服务中不可用。您必须使用有效的电子邮件注册帐户才能使用该服务。</font></font></p>
+<h3 tabindex="-1" dir="auto"><a id="user-content-web" class="anchor" aria-hidden="true" tabindex="-1" href="#web"><svg class="octicon octicon-link" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z"></path></svg></a><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">网络</font></font></h3>
+<p dir="auto"><font style="vertical-align: inherit;"></font><a href="https://web.tinode.co/" rel="nofollow"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">TinodeWeb 是一个单页 Web 应用程序，可从https://web.tinode.co/</font></font></a><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">（</font></font><a href="https://github.com/tinode/webapp/"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">来源</font></font></a><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">）获取</font><font style="vertical-align: inherit;">。请参阅下面的屏幕截图。</font></font></p>
+<h3 tabindex="-1" dir="auto"><a id="user-content-android" class="anchor" aria-hidden="true" tabindex="-1" href="#android"><svg class="octicon octicon-link" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z"></path></svg></a><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">安卓</font></font></h3>
+<p dir="auto"><a href="https://play.google.com/store/apps/details?id=co.tinode.tindroidx" rel="nofollow"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">适用于 Android 的 Tinode</font></font></a><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">（又名 Tindroid）稳定且功能齐全（</font></font><a href="https://github.com/tinode/tindroid"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">来源</font></font></a><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">）。请参阅下面的屏幕截图。</font><font style="vertical-align: inherit;">为了方便起见，还提供了</font><font style="vertical-align: inherit;">调试</font></font><a href="https://github.com/tinode/tindroid/releases/latest"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">APK 。</font></font></a><font style="vertical-align: inherit;"></font></p>
+<h3 tabindex="-1" dir="auto"><a id="user-content-ios" class="anchor" aria-hidden="true" tabindex="-1" href="#ios"><svg class="octicon octicon-link" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z"></path></svg></a><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">iOS系统</font></font></h3>
+<p dir="auto"><a href="https://apps.apple.com/us/app/tinode/id1483763538" rel="nofollow"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">iOS 版 Tinode</font></font></a><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">又名 Tinodios 稳定且功能齐全（</font></font><a href="https://github.com/tinode/ios"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">来源</font></font></a><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">）。请参阅下面的屏幕截图。</font></font></p>
+<h2 tabindex="-1" dir="auto"><a id="user-content-demosandbox" class="anchor" aria-hidden="true" tabindex="-1" href="#demosandbox"><svg class="octicon octicon-link" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z"></path></svg></a><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">演示/沙盒</font></font></h2>
+<p dir="auto"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">沙盒演示服务位于</font></font><a href="https://sandbox.tinode.co/" rel="nofollow"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">https://sandbox.tinode.co/</font></font></a><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">。</font></font></p>
+<p dir="auto"><font style="vertical-align: inherit;"></font><code>alice</code><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">以、</font></font><code>bob</code><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">、</font></font><code>carol</code><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">、</font></font><code>dave</code><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">、</font><font style="vertical-align: inherit;">之一身份登录</font></font><code>frank</code><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">。密码是</font></font><code>&lt;login&gt;123</code><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">，例如登录</font></font><code>alice</code><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">是</font></font><code>alice123</code><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">。您可以通过电子邮件或电话发现其他用户，方法是分别在他们前面加上</font></font><code>email:</code><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">或前缀</font></font><code>tel:</code><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">。</font></font><code>&lt;login&gt;@example.com</code><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">例如</font></font><code>alice@example.com</code><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">，</font><font style="vertical-align: inherit;">电子邮件是</font></font><code>+17025550001</code><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">通过的</font></font><code>+17025550009</code><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">。</font></font></p>
+<p dir="auto"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">当您注册新帐户时，系统会要求您提供用于发送验证码的电子邮件地址。出于演示目的，您可以将其用作</font></font><code>123456</code><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">通用验证代码。您在电子邮件中获得的代码也有效。</font></font></p>
+<h3 tabindex="-1" dir="auto"><a id="user-content-sandbox-notes" class="anchor" aria-hidden="true" tabindex="-1" href="#sandbox-notes"><svg class="octicon octicon-link" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z"></path></svg></a><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">沙盒笔记</font></font></h3>
+<ul dir="auto">
+<li><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">沙盒服务器会在太平洋时间每晚凌晨 3:15 重置（所有数据均被擦除）。错误消息</font></font><code>User not found or offline</code><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">意味着服务器在您连接时被重置。如果您在网络上看到它，请重新加载并重新登录。在 Android 上注销并重新登录。如果数据库已更改，请删除该应用程序然后重新安装。</font></font></li>
+<li><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">沙箱用户</font></font><code>Tino</code><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">是一个</font></font><a href="/tinode/chat/blob/master/chatbot"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">基本的聊天机器人</font></font></a><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">，它会</font></font><a href="http://fortunes.cat-v.org/" rel="nofollow"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">随机</font></font></a><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">引用任何消息进行响应。</font></font></li>
+<li><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">正如人们普遍接受的那样，当您注册新帐户时，系统会要求您提供电子邮件地址。服务器将向该地址发送一封包含验证码的电子邮件，您可以使用它来验证帐户。为了方便测试，服务器也会接受</font></font><code>123456</code><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">验证码。删除行</font></font><code>"debug_response": "123456"</code><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">以</font></font><code>tinode.conf</code><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">禁用此选项。</font></font></li>
+<li><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">沙箱服务器配置为使用</font></font><a href="https://letsencrypt.org/" rel="nofollow"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">ACME</font></font></a><font style="vertical-align: inherit;"><font style="vertical-align: inherit;"> TLS</font></font><a href="https://godoc.org/golang.org/x/crypto/acme" rel="nofollow"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">实现，并具有</font></font></a><font style="vertical-align: inherit;"></font><a href="https://en.wikipedia.org/wiki/Server_Name_Indication" rel="nofollow"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">SNI</font></font></a><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">的硬编码要求</font><font style="vertical-align: inherit;">。如果您无法连接，最可能的原因是您的 TLS 客户端缺少对 SNI 的支持。使用不同的客户端。</font></font></li>
+<li><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">默认 Web 应用程序加载单个缩小的 javascript 包和缩小的 CSS。未缩小的版本也可以在</font></font><a href="https://sandbox.tinode.co/index-dev.html" rel="nofollow"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">https://sandbox.tinode.co/index-dev.html上找到。</font></font></a></li>
+<li><a href="https://hub.docker.com/u/tinode/" rel="nofollow"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">具有相同演示的Docker 镜像</font></font></a><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">可供使用。</font></font></li>
+<li><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">欢迎您针对沙箱测试您的客户端软件、对其进行破解等。但请不要进行 DDoS 攻击。</font></font></li>
+</ul>
+<h2 tabindex="-1" dir="auto"><a id="user-content-features" class="anchor" aria-hidden="true" tabindex="-1" href="#features"><svg class="octicon octicon-link" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z"></path></svg></a><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">特征</font></font></h2>
+<h3 tabindex="-1" dir="auto"><a id="user-content-supported" class="anchor" aria-hidden="true" tabindex="-1" href="#supported"><svg class="octicon octicon-link" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z"></path></svg></a><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">支持的</font></font></h3>
+<ul dir="auto">
+<li><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">多个原生平台：
+</font></font><ul dir="auto">
+<li><a href="https://github.com/tinode/tindroid/"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">安卓</font></font></a><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">（Java）</font></font></li>
+<li><a href="https://github.com/tinode/ios"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">iOS</font></font></a><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">（斯威夫特）</font></font></li>
+<li><a href="https://github.com/tinode/webapp/"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">网络</font></font></a><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">（React.js）</font></font></li>
+<li><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">可编写脚本的</font></font><a href="/tinode/chat/blob/master/tn-cli"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">命令行</font></font></a><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">(Python)</font></font></li>
+</ul>
+</li>
+<li><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">用户特点：
+</font></font><ul dir="auto">
+<li><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">一对一和群组消息传递。</font></font></li>
+<li><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">视频和语音通话。语音留言。</font></font></li>
+<li><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">只读订阅者数量不受限制的频道。</font></font></li>
+<li><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">所有聊天都在所有设备上同步。</font></font></li>
+<li><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">精细的访问控制，具有各种操作的权限。</font></font></li>
+<li><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">用户搜索/发现。</font></font></li>
+<li><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">丰富的消息格式 Markdown-style： *style* → </font></font><strong><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">style</font></font></strong><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">，带有内嵌图像、视频、文件附件。</font></font></li>
+<li><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">适用于聊天机器人的表单和模板化响应。</font></font></li>
+<li><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">已验证/员工/不受信任的帐户标记。</font></font></li>
+<li><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">消息状态通知：消息传送到服务器；收到并阅读通知；键入通知。</font></font></li>
+<li><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">联系人列表中的最新消息预览。</font></font></li>
+<li><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">服务器为人员、群聊生成的状态通知。</font></font></li>
+<li><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">转发和回复消息。</font></font></li>
+<li><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">编辑已发送的消息。</font></font></li>
+</ul>
+</li>
+<li><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">行政：
+</font></font><ul dir="auto">
+<li><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">精细的访问控制，具有各种操作的权限。</font></font></li>
+<li><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">支持自定义身份验证后端。</font></font></li>
+<li><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">能够阻止服务器端不需要的通信。</font></font></li>
+<li><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">匿名用户（对于与聊天技术支持相关的用例很重要）。</font></font></li>
+<li><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">用于扩展功能的插件，例如支持审核或聊天机器人。</font></font></li>
+<li><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">用于服务器管理的</font><font style="vertical-align: inherit;">可编写脚本的</font></font><a href="/tinode/chat/blob/master/tn-cli"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">命令行工具。</font></font></a><font style="vertical-align: inherit;"></font></li>
+</ul>
+</li>
+<li><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">性能、可靠性和开发：
+</font></font><ul dir="auto">
+<li><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">具有故障转移功能的分片集群。</font></font></li>
+<li><font style="vertical-align: inherit;"></font><a href="https://github.com/tinode/chat/blob/master/server/media/media.go#L21"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">使用本地文件系统或 Amazon S3 存储和带外传输大型对象，例如图像或文档文件（媒体处理</font></font></a><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">程序可以支持其他存储系统</font><font style="vertical-align: inherit;">）。</font></font></li>
+<li><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">JSON 或</font></font><a href="https://developers.google.com/protocol-buffers/" rel="nofollow"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">protobuf 版本 3</font></font></a><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">有线协议。</font></font></li>
+<li><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">各种编程语言的绑定：
+</font></font><ul dir="auto">
+<li><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">没有外部依赖的 JavaScript。</font></font></li>
+<li><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">Java 依赖于</font></font><a href="https://github.com/FasterXML/jackson"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">Jackson</font></font></a><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">和</font></font><a href="https://github.com/TooTallNate/Java-WebSocket"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">Java-Websocket</font></font></a><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">。适用于 Android，但没有 Android SDK 依赖项。</font></font></li>
+<li><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">Swift，没有外部依赖。</font></font></li>
+<li><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">C/C++、C#、Go、Python、PHP、Ruby 和许多其他使用</font></font><a href="https://grpc.io/docs/languages/" rel="nofollow"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">gRPC 的</font></font></a><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">语言。</font></font></li>
+</ul>
+</li>
+<li><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">选择数据库后端。可以通过编写</font></font><a href="/tinode/chat/blob/master/server/db/adapter.go"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">适配器</font></font></a><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">来添加其他数据库</font><font style="vertical-align: inherit;">。
+</font></font><ul dir="auto">
+<li><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">MySQL</font></font></li>
+<li><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">PostgreSQL</font></font></li>
+<li><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">MongoDB</font></font></li>
+<li><a href="http://rethinkdb.com/" rel="nofollow"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">重新思考数据库</font></font></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h3 tabindex="-1" dir="auto"><a id="user-content-planned" class="anchor" aria-hidden="true" tabindex="-1" href="#planned"><svg class="octicon octicon-link" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z"></path></svg></a><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">计划</font></font></h3>
+<ul dir="auto">
+<li><a href="https://en.wikipedia.org/wiki/Federation_(information_technology)" rel="nofollow"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">联邦</font></font></a><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">。</font></font></li>
+<li><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">位置和联系人共享。</font></font></li>
+<li><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">附加文档、链接的预览。</font></font></li>
+<li><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">录制视频消息。</font></font></li>
+<li><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">视频/音频广播。</font></font></li>
+<li><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">群组视频/音频通话。</font></font></li>
+<li><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">附加除语音消息之外的音乐/音频。</font></font></li>
+<li><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">更好的表情符号支持。</font></font></li>
+<li><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">不同级别的消息持久性（从严格持久性到“存储直至交付”到纯粹的短暂消息传递）。</font></font></li>
+<li><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">静态消息加密。</font></font></li>
+<li><font style="vertical-align: inherit;"></font><a href="https://en.wikipedia.org/wiki/Off-the-Record_Messaging" rel="nofollow"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">使用OTR</font></font></a><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">进行端到端加密，</font><font style="vertical-align: inherit;">用于一对一消息传递，以及用于群组消息传递的未确定方法。</font></font></li>
+<li><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">消息中的全文搜索。</font></font></li>
+</ul>
+<h3 tabindex="-1" dir="auto"><a id="user-content-translations" class="anchor" aria-hidden="true" tabindex="-1" href="#translations"><svg class="octicon octicon-link" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z"></path></svg></a><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">翻译</font></font></h3>
+<p dir="auto"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">所有客户端软件都支持</font></font><a href="/tinode/chat/blob/master/docs/translations.md"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">国际化</font></font></a><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">。提供以下翻译：</font></font></p>
+<table>
+<thead>
+<tr>
+<th><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">语言</font></font></th>
+<th align="center"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">服务器</font></font></th>
+<th align="center"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">网络应用程序</font></font></th>
+<th align="center"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">安卓</font></font></th>
+<th align="center"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">iOS系统</font></font></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">英语</font></font></td>
+<td align="center"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">✓</font></font></td>
+<td align="center"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">✓</font></font></td>
+<td align="center"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">✓</font></font></td>
+<td align="center"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">✓</font></font></td>
+</tr>
+<tr>
+<td><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">简体中文</font></font></td>
+<td align="center"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">✓</font></font></td>
+<td align="center"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">✓</font></font></td>
+<td align="center"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">✓</font></font></td>
+<td align="center"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">✓</font></font></td>
+</tr>
+<tr>
+<td><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">中国传统的</font></font></td>
+<td align="center"></td>
+<td align="center"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">✓</font></font></td>
+<td align="center"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">✓</font></font></td>
+<td align="center"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">✓</font></font></td>
+</tr>
+<tr>
+<td><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">法语</font></font></td>
+<td align="center"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">✓</font></font></td>
+<td align="center"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">✓</font></font></td>
+<td align="center"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">✓</font></font></td>
+<td align="center"></td>
+</tr>
+<tr>
+<td><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">德语</font></font></td>
+<td align="center"></td>
+<td align="center"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">✓</font></font></td>
+<td align="center"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">✓</font></font></td>
+<td align="center"></td>
+</tr>
+<tr>
+<td><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">印地语</font></font></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">✓</font></font></td>
+<td align="center"></td>
+</tr>
+<tr>
+<td><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">韩国人</font></font></td>
+<td align="center"></td>
+<td align="center"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">✓</font></font></td>
+<td align="center"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">✓</font></font></td>
+<td align="center"></td>
+</tr>
+<tr>
+<td><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">葡萄牙语</font></font></td>
+<td align="center"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">✓</font></font></td>
+<td align="center"></td>
+<td align="center"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">✓</font></font></td>
+<td align="center"></td>
+</tr>
+<tr>
+<td><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">罗马尼亚语</font></font></td>
+<td align="center"></td>
+<td align="center"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">✓</font></font></td>
+<td align="center"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">✓</font></font></td>
+<td align="center"></td>
+</tr>
+<tr>
+<td><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">俄语</font></font></td>
+<td align="center"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">✓</font></font></td>
+<td align="center"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">✓</font></font></td>
+<td align="center"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">✓</font></font></td>
+<td align="center"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">✓</font></font></td>
+</tr>
+<tr>
+<td><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">西班牙语</font></font></td>
+<td align="center"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">✓</font></font></td>
+<td align="center"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">✓</font></font></td>
+<td align="center"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">✓</font></font></td>
+<td align="center"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">✓</font></font></td>
+</tr>
+<tr>
+<td><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">泰国</font></font></td>
+<td align="center"></td>
+<td align="center"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">✓</font></font></td>
+<td align="center"></td>
+<td align="center"></td>
+</tr>
+<tr>
+<td><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">乌克兰</font></font></td>
+<td align="center"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">✓</font></font></td>
+<td align="center"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">✓</font></font></td>
+<td align="center"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">✓</font></font></td>
+<td align="center"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">✓</font></font></td>
+</tr>
+<tr>
+<td><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">越南语</font></font></td>
+<td align="center"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">✓</font></font></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+</tr>
+</tbody>
+</table>
+<p dir="auto"><font style="vertical-align: inherit;"></font><a href="/tinode/chat/blob/master/docs/translations.md"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">欢迎</font></font></a><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">更多翻译</font><font style="vertical-align: inherit;">。除了上面列出的语言外，对阿拉伯语、孟加拉语、印度尼西亚语、乌尔都语、日语、土耳其语、波斯语特别感兴趣。</font></font></p>
+<h2 tabindex="-1" dir="auto"><a id="user-content-third-party" class="anchor" aria-hidden="true" tabindex="-1" href="#third-party"><svg class="octicon octicon-link" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z"></path></svg></a><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">第三者</font></font></h2>
+<h3 tabindex="-1" dir="auto"><a id="user-content-projects" class="anchor" aria-hidden="true" tabindex="-1" href="#projects"><svg class="octicon octicon-link" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z"></path></svg></a><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">项目</font></font></h3>
+<ul dir="auto">
+<li><a href="https://github.com/gfxlabs/chat/tree/master/server/db/arango"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">Arango 数据库适配器</font></font></a></li>
+<li><a href="https://github.com/riandyrn/chat/tree/master/server/db/dynamodb"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">DynamoDB 适配器</font></font></a><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">（已过时）</font></font></li>
+</ul>
+<h3 tabindex="-1" dir="auto"><a id="user-content-licenses" class="anchor" aria-hidden="true" tabindex="-1" href="#licenses"><svg class="octicon octicon-link" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z"></path></svg></a><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">许可证</font></font></h3>
+<ul dir="auto">
+<li><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">演示头像和其他一些图形来自</font></font><a href="https://www.pexels.com/" rel="nofollow"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">https://www.pexels.com/ （在</font></font></a><font style="vertical-align: inherit;"></font><a href="https://www.pexels.com/photo-license/" rel="nofollow"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">CC0 许可</font></font></a><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">下）</font><font style="vertical-align: inherit;">和</font></font><a href="https://pixabay.com/" rel="nofollow"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">https://pixabay.com/（</font></font></a><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">在其</font></font><a href="https://pixabay.com/service/license/" rel="nofollow"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">许可</font></font></a><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">下） 。</font></font></li>
+<li><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">Web 和 Android 背景图案来自</font></font><a href="http://subtlepatterns.com/" rel="nofollow"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">http://subtlepatterns.com/</font></font></a><font style="vertical-align: inherit;"><font style="vertical-align: inherit;"> ，遵循</font></font><a href="https://creativecommons.org/licenses/by-sa/3.0/" rel="nofollow"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">CC BY-SA 3.0</font></font></a><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">许可。</font></font></li>
+<li><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">Android 图标来自</font></font><a href="https://material.io/tools/icons/" rel="nofollow"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">https://material.io/tools/icons/</font></font></a><font style="vertical-align: inherit;"><font style="vertical-align: inherit;"> ，采用</font></font><a href="https://www.apache.org/licenses/LICENSE-2.0.html" rel="nofollow"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">Apache 2.0</font></font></a><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">许可。</font></font></li>
+</ul>
+<h2 tabindex="-1" dir="auto"><a id="user-content-screenshots" class="anchor" aria-hidden="true" tabindex="-1" href="#screenshots"><svg class="octicon octicon-link" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z"></path></svg></a><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">截图</font></font></h2>
+<h3 tabindex="-1" dir="auto"><a id="user-content-android-1" class="anchor" aria-hidden="true" tabindex="-1" href="#android-1"><svg class="octicon octicon-link" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z"></path></svg></a><a href="https://github.com/tinode/tindroid/"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">安卓</font></font></a></h3>
+<p align="center" dir="auto">
+<a target="_blank" rel="noopener noreferrer" href="/tinode/chat/blob/master/docs/android-contacts.png"><img src="/tinode/chat/raw/master/docs/android-contacts.png" alt="Android 截图：聊天列表" width="250" style="max-width: 100%;"></a>
+<a target="_blank" rel="noopener noreferrer" href="/tinode/chat/blob/master/docs/android-chat.png"><img src="/tinode/chat/raw/master/docs/android-chat.png" alt="Android 屏幕截图：一场对话" width="250" style="max-width: 100%;"></a>
+<a target="_blank" rel="noopener noreferrer" href="/tinode/chat/blob/master/docs/android-video-call.png"><img src="/tinode/chat/raw/master/docs/android-video-call.png" alt="Android 屏幕截图：视频通话" width="250" style="max-width: 100%;"></a>
 </p>
-
-### [iOS](https://github.com/tinode/ios)
-
-<p align="center">
-<img src="docs/ios-contacts.png" alt="iOS screenshot: list of chats" width=250 /> <img src="docs/ios-chat.png" alt="iOS screenshot: one conversation" width=250 /> <img src="docs/ios-video-call.png" alt="iOS screenshot: video call" width="250" />
+<h3 tabindex="-1" dir="auto"><a id="user-content-ios-1" class="anchor" aria-hidden="true" tabindex="-1" href="#ios-1"><svg class="octicon octicon-link" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z"></path></svg></a><a href="https://github.com/tinode/ios"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">iOS系统</font></font></a></h3>
+<p align="center" dir="auto">
+<a target="_blank" rel="noopener noreferrer" href="/tinode/chat/blob/master/docs/ios-contacts.png"><img src="/tinode/chat/raw/master/docs/ios-contacts.png" alt="iOS 截图：聊天列表" width="250" style="max-width: 100%;"></a> <a target="_blank" rel="noopener noreferrer" href="/tinode/chat/blob/master/docs/ios-chat.png"><img src="/tinode/chat/raw/master/docs/ios-chat.png" alt="iOS 屏幕截图：一场对话" width="250" style="max-width: 100%;"></a> <a target="_blank" rel="noopener noreferrer" href="/tinode/chat/blob/master/docs/ios-video-call.png"><img src="/tinode/chat/raw/master/docs/ios-video-call.png" alt="iOS 截图：视频通话" width="250" style="max-width: 100%;"></a>
 </p>
-
-### [Desktop Web](https://github.com/tinode/webapp/)
-
-<p align="center">
-  <img src="docs/web-desktop.jpg" alt="Desktop web: full app" width=810 />
+<h3 tabindex="-1" dir="auto"><a id="user-content-desktop-web" class="anchor" aria-hidden="true" tabindex="-1" href="#desktop-web"><svg class="octicon octicon-link" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z"></path></svg></a><a href="https://github.com/tinode/webapp/"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">桌面网络</font></font></a></h3>
+<p align="center" dir="auto">
+  <a target="_blank" rel="noopener noreferrer" href="/tinode/chat/blob/master/docs/web-desktop.jpg"><img src="/tinode/chat/raw/master/docs/web-desktop.jpg" alt="桌面网络：完整应用程序" width="810" style="max-width: 100%;"></a>
 </p>
-
-### [Mobile Web](https://github.com/tinode/webapp/)
-
-<p align="center">
-  <img src="docs/web-mob-contacts.png" alt="Mobile web: contacts" width=250 /> <img src="docs/web-mob-chat.png" alt="Mobile web: chat" width=250 /> <img src="docs/web-mob-video-call.png" alt="Mobile web: topic info" width=250 />
+<h3 tabindex="-1" dir="auto"><a id="user-content-mobile-web" class="anchor" aria-hidden="true" tabindex="-1" href="#mobile-web"><svg class="octicon octicon-link" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z"></path></svg></a><a href="https://github.com/tinode/webapp/"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">移动网络</font></font></a></h3>
+<p align="center" dir="auto">
+  <a target="_blank" rel="noopener noreferrer" href="/tinode/chat/blob/master/docs/web-mob-contacts.png"><img src="/tinode/chat/raw/master/docs/web-mob-contacts.png" alt="移动网络：联系人" width="250" style="max-width: 100%;"></a> <a target="_blank" rel="noopener noreferrer" href="/tinode/chat/blob/master/docs/web-mob-chat.png"><img src="/tinode/chat/raw/master/docs/web-mob-chat.png" alt="移动网络：聊天" width="250" style="max-width: 100%;"></a> <a target="_blank" rel="noopener noreferrer" href="/tinode/chat/blob/master/docs/web-mob-video-call.png"><img src="/tinode/chat/raw/master/docs/web-mob-video-call.png" alt="移动网络：主题信息" width="250" style="max-width: 100%;"></a>
 </p>
-
-
-#### SEO Strings
-
-Words 'chat' and 'instant messaging' in Chinese, Russian, Persian and a few other languages.
-
-* 聊天室 即時通訊
-* чат мессенджер
-* インスタントメッセージ
-* 인스턴트 메신저
-* پیام رسان فوری
-* تراسل فوري
-* فوری پیغام رسانی
-* Nhắn tin tức thời
-* anlık mesajlaşma sohbet
-* mensageiro instantâneo
-* pesan instan
-* mensajería instantánea
-* চ্যাট ইন্সট্যান্ট মেসেজিং
-* चैट त्वरित संदेश
-* তাৎক্ষণিক বার্তা আদান প্রদান
+<h4 tabindex="-1" dir="auto"><a id="user-content-seo-strings" class="anchor" aria-hidden="true" tabindex="-1" href="#seo-strings"><svg class="octicon octicon-link" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z"></path></svg></a><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">搜索引擎优化字符串</font></font></h4>
+<p dir="auto"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">中文、俄语、波斯语和其他几种语言中的“聊天”和“即时消息”一词。</font></font></p>
+<ul dir="auto">
+<li><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">聊天室 即时通讯</font></font></li>
+<li><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">жат мессенджер</font></font></li>
+<li><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">因苏坦托梅塞吉</font></font></li>
+<li><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">인스턴트 메신저</font></font></li>
+<li><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">???????????????????????????????????????????????????????????????</font></font></li>
+<li><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">塔拉·克洛里</font></font></li>
+<li><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">Ёхано</font></font></li>
+<li><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">Nhắn Tin tức thời</font></font></li>
+<li><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">安利克·梅萨吉拉斯玛·苏赫贝特</font></font></li>
+<li><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">即时消息</font></font></li>
+<li><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">即时报</font></font></li>
+<li><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">即时消息</font></font></li>
+<li><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">চ্যাট ইন্সট্যান্ট মেসেজিং</font></font></li>
+<li><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">चैट त्वरित संदेश</font></font></li>
+<li><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">তাৎক্ষণিকবার্তাআদানপ্রদান</font></font></li>
+</ul>
+</article></div>
